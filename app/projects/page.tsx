@@ -64,11 +64,21 @@ export default function ProjectsPage() {
 
   const runAgent = async (taskId: number) => {
     setLaunching(taskId)
-    await fetch('/api/run-agent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task_id: taskId }),
-    })
+    // Marcar como in_progress optimísticamente para que el polling arranque
+    setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: 'in_progress' } : t))
+    try {
+      const res = await fetch('/api/run-agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_id: taskId }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        alert(`Error del agente: ${err.detail || err.error}`)
+      }
+    } catch (e) {
+      alert(`Error de conexión: ${e}`)
+    }
     setLaunching(null)
     load()
   }
