@@ -20,7 +20,7 @@ function log(taskId: number, message: string) {
   const current = db.prepare('SELECT agent_log FROM tasks WHERE id = ?').get(taskId) as { agent_log: string } | undefined
   const prev = current?.agent_log || ''
   const timestamp = new Date().toISOString().slice(11, 19)
-  db.prepare('UPDATE tasks SET agent_log = ?, updated_at = datetime('now') WHERE id = ?')
+  db.prepare("UPDATE tasks SET agent_log = ?, updated_at = datetime('now') WHERE id = ?")
     .run(`${prev}[${timestamp}] ${message}\n`, taskId)
 }
 
@@ -127,7 +127,7 @@ Sé conciso y técnico.
   const prBody = `${planJson.pr_body}\n\n## Review del agente\n${review}\n\n---\n_Generado automáticamente por Team Developers_`
   const { url, number } = await createPR(owner, repo, planJson.pr_title, prBody, planJson.branch, baseBranch)
 
-  db.prepare('UPDATE tasks SET status = ?, pr_url = ?, pr_number = ?, updated_at = datetime('now') WHERE id = ?')
+  db.prepare("UPDATE tasks SET status = ?, pr_url = ?, pr_number = ?, updated_at = datetime('now') WHERE id = ?")
     .run('pr_open', url, number, task.id)
 
   log(task.id, `[Done] PR #${number} creado: ${url}`)
