@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     if (!project) return NextResponse.json({ error: 'Proyecto no encontrado' }, { status: 404 })
 
-    db.prepare('UPDATE tasks SET status = ?, updated_at = datetime("now") WHERE id = ?')
+    db.prepare("UPDATE tasks SET status = ?, updated_at = datetime('now') WHERE id = ?")
       .run('in_progress', task_id)
 
     // Correr el agente de forma síncrona (la UI hace polling del status)
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       await runOrchestrator({ task, project })
     } catch (err) {
       console.error('Agent error:', err)
-      db.prepare('UPDATE tasks SET status = ?, agent_log = ?, updated_at = datetime("now") WHERE id = ?')
+      db.prepare("UPDATE tasks SET status = ?, agent_log = ?, updated_at = datetime('now') WHERE id = ?")
         .run('error', String(err), task_id)
       return NextResponse.json({ error: 'Error en el agente', detail: String(err) }, { status: 500 })
     }
